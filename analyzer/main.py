@@ -141,7 +141,7 @@ def analyze_module(module: Module, config: Config):
             "percent": round(v / updates, 2)
         } for l, v in langs.items()
         ],
-        "feautures": [{
+        "features": [{
             "name": author,
             "feature": feature,
             "percent": round(value / updates, 2)
