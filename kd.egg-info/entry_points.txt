@@ -1,3 +1,0 @@
-[console_scripts]
-kd = analyzer.main:main
-

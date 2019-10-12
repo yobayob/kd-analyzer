@@ -3,5 +3,5 @@
 __pycache__
 analyzer/gitlog-samples/*
 build
-analyzer.egg-info
+kd.egg-info
 dist
