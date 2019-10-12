@@ -1,0 +1,7 @@
+.idea
+.venv
+__pycache__
+analyzer/gitlog-samples/*
+build
+analyzer.egg-info
+dist

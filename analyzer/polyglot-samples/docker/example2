@@ -1,0 +1,12 @@
+FROM debian:9
+
+MAINTAINER Hi-IT "info@hi-it.spb.ru"
+
+WORKDIR /code/worker
+RUN mkdir -p /code/worker/media
+COPY epath2 /code/worker/
+ADD frontend/dist /code/worker/frontend/dist
+ADD configs /code/worker/configs
+ADD templates /code/worker/templates
+
+CMD ["/code/worker/epath2"]

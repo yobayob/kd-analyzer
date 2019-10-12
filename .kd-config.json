@@ -1,0 +1,30 @@
+{
+    "repo": "https://github.com/yobayob/for-selectel.git",
+    "modules": [
+        {
+            "name": "main",
+            "path": "analyzer"
+        }
+    ],
+    "authors": [{
+        "name": "ekonechnyi",
+        "aliases": ["e.konechnyi", "ekonechnyi"]
+    }],
+    "description": "",
+    "ignore": [
+        "analyzer\\/gitlog-samples",
+        "analyzer\\/polyglot-samples",
+        "__pycache__",
+        "\\.idea",
+        "\\.venv",
+        "analyzer\\.egg-info",
+        "\\.json",
+        ".git",
+        "build",
+        "dist"
+    ],
+    "name": "for-selectel",
+    "services": [{
+        "name": "kd-web-interface"
+    }]
+}
