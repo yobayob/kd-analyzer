@@ -25,51 +25,45 @@ kd
 Result:
 ```json
 {
-    "main": {
-        "deps": {
-            "typing": 0.22,
-            "re": 0.25,
-            "logging": 0.06,
-            "collections": 0.04,
-            "pathlib": 0.02,
-            "json": 0.07,
-            "dataclasses": 0.04,
-            "argparse": 0.03,
-            "os": 0.3,
-            "deps": 0.03,
-            "subprocess": 0.04,
-            "esprima": 0.02,
-            "ast": 0.03,
-            "marshmallow_dataclass": 0.02,
-            "math": 0.01,
-            "__future__": 0.03,
-            "asyncio": 0.01
-        },
-        "authors": {
-            "ekonechnyi": 1.0
-        },
-        "languages": {
-            "python": 1.0
-        },
-        "feautures": [
-            {
-                "ekonechnyi": "ekonechnyi",
-                "features": 0.8
+    "name": "for-selectel",
+    "repository": "https://github.com/yobayob/for-selectel.git",
+    "modules": [
+        {
+            "name": "main",
+            "dependencies": {
+                "typing": 0.2,
+                "re": 0.15,
+                "marshmallow_dataclass": 0.02,
+                "dataclasses": 0.05,
+                "os": 0.1,
+                "json": 0.1,
+                "collections": 0.06,
+                "math": 0.02,
+                "__future__": 0.05,
+                "ast": 0.01,
+                "esprima": 0.01,
+                "subprocess": 0.03,
+                "argparse": 0.05,
+                "asyncio": 0.03,
+                "gitlog": 0.05,
+                "logging": 0.05,
+                "sys": 0.02,
+                "pathlib": 0.02
             },
-            {
-                "ekonechnyi": "ekonechnyi",
-                "tests": 0.07
+            "authors": {
+                "ekonechnyi": 1.0
             },
-            {
-                "ekonechnyi": "ekonechnyi",
-                "refactoring": 0.08
+            "languages": {
+                "python": 1.0
             },
-            {
-                "ekonechnyi": "ekonechnyi",
-                "bugs": 0.05
-            }
-        ]
-    }
+            "feautures": [
+                {
+                    "name": "ekonechnyi",
+                    "features": 1.0
+                }
+            ]
+        }
+    ]
 }
 
 ```
