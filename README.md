@@ -25,46 +25,113 @@ kd
 Result:
 ```json
 {
-    "name": "for-selectel",
-    "repository": "https://github.com/yobayob/for-selectel.git",
+    "name": "kd-analyzer",
+    "repository": "https://github.com/yobayob/kd-analyzer.git",
     "modules": [
         {
             "name": "main",
-            "dependencies": {
-                "typing": 0.2,
-                "re": 0.15,
-                "marshmallow_dataclass": 0.02,
-                "dataclasses": 0.05,
-                "os": 0.1,
-                "json": 0.1,
-                "collections": 0.06,
-                "math": 0.02,
-                "__future__": 0.05,
-                "ast": 0.01,
-                "esprima": 0.01,
-                "subprocess": 0.03,
-                "argparse": 0.05,
-                "asyncio": 0.03,
-                "gitlog": 0.05,
-                "logging": 0.05,
-                "sys": 0.02,
-                "pathlib": 0.02
-            },
-            "authors": {
-                "ekonechnyi": 1.0
-            },
-            "languages": {
-                "python": 1.0
-            },
-            "feautures": [
+            "dependencies": [
+                {
+                    "name": "re",
+                    "percent": 0.14
+                },
+                {
+                    "name": "typing",
+                    "percent": 0.19
+                },
+                {
+                    "name": "dataclasses",
+                    "percent": 0.06
+                },
+                {
+                    "name": "os",
+                    "percent": 0.1
+                },
+                {
+                    "name": "json",
+                    "percent": 0.1
+                },
+                {
+                    "name": "marshmallow_dataclass",
+                    "percent": 0.02
+                },
+                {
+                    "name": "math",
+                    "percent": 0.02
+                },
+                {
+                    "name": "collections",
+                    "percent": 0.07
+                },
+                {
+                    "name": "__future__",
+                    "percent": 0.04
+                },
+                {
+                    "name": "ast",
+                    "percent": 0.01
+                },
+                {
+                    "name": "esprima",
+                    "percent": 0.01
+                },
+                {
+                    "name": "subprocess",
+                    "percent": 0.03
+                },
+                {
+                    "name": "logging",
+                    "percent": 0.05
+                },
+                {
+                    "name": "asyncio",
+                    "percent": 0.03
+                },
+                {
+                    "name": "gitlog",
+                    "percent": 0.05
+                },
+                {
+                    "name": "argparse",
+                    "percent": 0.05
+                },
+                {
+                    "name": "pathlib",
+                    "percent": 0.02
+                },
+                {
+                    "name": "sys",
+                    "percent": 0.02
+                }
+            ],
+            "authors": [
                 {
                     "name": "ekonechnyi",
-                    "features": 1.0
+                    "percent": 1.0
+                }
+            ],
+            "languages": [
+                {
+                    "name": "python",
+                    "percent": 1.0
+                }
+            ],
+            "features": [
+                {
+                    "name": "ekonechnyi",
+                    "feature": "bugs",
+                    "percent": 0.06
+                },
+                {
+                    "name": "ekonechnyi",
+                    "feature": "features",
+                    "percent": 0.94
                 }
             ]
         }
     ]
 }
+
 
 ```
 
