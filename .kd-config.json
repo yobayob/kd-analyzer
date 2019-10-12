@@ -1,5 +1,5 @@
 {
-    "repo": "https://github.com/yobayob/for-selectel.git",
+    "repo": "https://github.com/yobayob/kd-analyzer.git",
     "modules": [
         {
             "name": "main",
@@ -23,7 +23,7 @@
         "build",
         "dist"
     ],
-    "name": "for-selectel",
+    "name": "kd-analyzer",
     "services": [{
         "name": "kd-web-interface"
     }]

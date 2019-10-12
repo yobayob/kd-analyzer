@@ -49,10 +49,15 @@ def get_js_deps(s: str) -> Set[str]:
     r = set()
     for token in script.body:
         if token.type == 'ImportDeclaration':
+            if str(token.source.value).startswith("."):
+                continue
             r.add(token.source.value)
             continue
         if token.type == 'CallExpression':
             if token.callee.name != "require":
+                continue
+            print(token.arguments[0].value)
+            if str(token.arguments[0].value).startswith("."):
                 continue
             r.add(token.arguments[0].value)
     return r

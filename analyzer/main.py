@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from .config import Config, Module
 from .utils import scandir, exec
 from .polyglot import Polyglot
-from .deps import get_python_deps
+from .deps import get_python_deps, get_js_deps
 from dataclasses import dataclass
 from .gitlog import CommitMessageClassifier, extract_commits
 from collections import defaultdict
@@ -13,8 +13,7 @@ import pathlib
 import json
 import sys
 
-logging.basicConfig(level = logging.DEBUG, stream=sys.stderr)
-
+logging.basicConfig(level=logging.DEBUG, stream=sys.stderr)
 
 # TODO: fooo
 BASE_DIR = ""
@@ -28,13 +27,14 @@ class File:
     updates: int = 0
 
 
-
 MAX_READ_SIZE = 2 ** 16
 DEFAULT_CONFIG_PATH = ".kd-config.json"
 
 polyglot = Polyglot.load(os.path.join(os.path.abspath(os.path.dirname(__file__)), "polyglot-classifier.json"))
 
-gitlog = CommitMessageClassifier.load(os.path.join(os.path.abspath(os.path.dirname(__file__)), "classifier-gitlog.json"))
+gitlog = CommitMessageClassifier.load(
+    os.path.join(os.path.abspath(os.path.dirname(__file__)), "classifier-gitlog.json"))
+
 
 def init(repo: str):
     with open(os.path.join(repo, DEFAULT_CONFIG_PATH), "w") as f:
@@ -61,11 +61,16 @@ def analyze_module(module: Module, config: Config):
                 results[file] = File(file, "UNKNOWN", set())
                 continue
         ext = pathlib.Path(file).suffix
-        lang =  polyglot.classify(s, ext)
+        lang = polyglot.classify(s, ext)
         deps = set()
         if lang == "python":
             try:
                 deps = get_python_deps(s)
+            except:
+                pass
+        if lang == 'js':
+            try:
+                deps = get_js_deps(s)
             except:
                 pass
         results[file] = File(file, lang, deps)
@@ -108,26 +113,39 @@ def analyze_module(module: Module, config: Config):
         else:
             _deps = v.deps
 
-        #TODO: skip inner dependency :)
+        # TODO: skip inner dependency :)
         for d in _deps:
-            deps[d] += v.updates/len(_deps)
+            deps[d] += v.updates / len(_deps)
     if not updates:
         return {
             "name": module.name,
-            "dependencies": {},
-            "authors": {},
-            "languages": {},
-            "features": {},
+            "dependencies": [],
+            "authors": [],
+            "languages": [],
+            "features": [],
         }
     return {
         "name": module.name,
-        "dependencies": {d: round(v/updates, 2) for d, v in deps.items()},
-        "authors": {a: round(v/updates, 2) for a, v in authors.items()},
-        "languages": {l: round(v/updates, 2) for l, v in langs.items()},
-        "feautures": [
-            {"name": author,
-            feature: round(value/updates, 2)}
-            for (author, feature), value in author_feature.items()
+        "dependencies": [{
+            "name": d,
+            "percent": round(v / updates, 2)
+        } for d, v in deps.items()
+        ],
+        "authors": [{
+            "name": a,
+            "percent": round(v / updates, 2)
+        } for a, v in authors.items()
+        ],
+        "languages": [{
+            "name": l,
+            "percent": round(v / updates, 2)
+        } for l, v in langs.items()
+        ],
+        "feautures": [{
+            "name": author,
+            "feature": feature,
+            "percent": round(value / updates, 2)
+        } for (author, feature), value in author_feature.items()
         ]
     }
 
@@ -153,6 +171,7 @@ def analyze(repo):
         r["modules"].append(analyze_module(module, config))
     print(json.dumps(r, indent=4))
 
+
 def main():
     parser = ArgumentParser(description="Help me, I don't know what i'm doing")
     parser.add_argument('--repo', default=".", dest="repo", help="Repository")
@@ -168,4 +187,3 @@ def main():
 
     if not args.cmd:
         analyze(args.repo)
-
