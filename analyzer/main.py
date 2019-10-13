@@ -24,7 +24,7 @@ class File:
     path: str
     lang: str
     deps: Set[str]
-    updates: int = 0
+    updates: float = 0
 
 
 MAX_READ_SIZE = 2 ** 16
