@@ -4,7 +4,8 @@ from .classifier import Classifier
 from .utils import extract, int_or_zero, extract_pipeline, search, exec
 from typing import NamedTuple, Tuple, List, Iterator
 from collections import defaultdict
-
+from catboost import CatBoostClassifier
+import pandas as pd
 
 __all__ = [
     'CommitMessageClassifier',
@@ -190,6 +191,9 @@ class CommitMessageClassifier(Classifier):
     @staticmethod
     def extract(s: str):
         return extract_pipeline(GITLOG_PIPELINE, s, pos=0)
+
+    def classify_by_model(self, s: str):
+        return predict_commit(s)
 
 
     def analyze(self, path: str):
@@ -399,11 +403,15 @@ class CommitMessageClassifier(Classifier):
 #     ioloop.run_until_complete(check())
 #     ioloop.stop()
 #     ioloop.close()
-from catboost import CatBoostClassifier
 
-X_train = pd.read_json('X_train')
-cat_model.load_model('cat_model')
-def predict_commit(new_commit,cat_model,X_train):
+import os
+import random
+
+cat_model = CatBoostClassifier().load_model(os.path.join(os.path.abspath(os.path.dirname(__file__)), "cat_model"))
+X_train = pd.read_json(os.path.join(os.path.abspath(os.path.dirname(__file__)), "X_train.json"))
+
+
+def predict_commit(new_commit):
 
     freq = pd.Series(''.join(new_commit).split()).value_counts()
     dic1 = pd.DataFrame(freq)
@@ -418,8 +426,7 @@ def predict_commit(new_commit,cat_model,X_train):
     dic1.index = dic1['id']
     dic1.index.name = 'index'
 
-    X_train = pd.read_json('X_train.json')
-    new_table = pd.pivot_table(dic1, index = 'id',
+    pd.pivot_table(dic1, index = 'id',
                             columns = 'lemma',
                             values='guess',
                             aggfunc=len)
@@ -441,17 +448,13 @@ def predict_commit(new_commit,cat_model,X_train):
     predict = predict[0]
     predict = int(predict)
 
-    if predict == 0:
-        predict = 'bugs'
-    elif predict == 1:
-        predict = 'docs'
-    elif predict == 2:
-        predict = 'features'
-    elif predict == 3:
-        predict = 'refactoring'
-    elif predict == 4:
-        predict = 'tests'
-    elif predict == 5:
-        predict = 'version'
-
-    return predict, predict_proba
+    map_predict = {
+        0: 'bugs',
+        1: 'docs',
+        2: 'features',
+        3: 'refactoring',
+        4: 'tests',
+        5: 'version'
+    }
+    print(map_predict.get(predict, 'UNKNOWN'), new_commit)
+    return map_predict.get(predict, 'UNKNOWN')

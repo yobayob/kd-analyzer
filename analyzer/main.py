@@ -83,7 +83,7 @@ def analyze_module(module: Module, config: Config):
 
     for commit in extract_commits(stdout):
 
-        feature = gitlog.classify(commit.message)
+        feature = gitlog.classify_by_model(commit.message)
         features[feature] += 1
         author = authors_aliases.get(commit.author.name, commit.author.name)
 
@@ -100,7 +100,6 @@ def analyze_module(module: Module, config: Config):
     langs = defaultdict(lambda: 0.0)
     deps = defaultdict(lambda: 0.0)
     for name, v in results.items():
-
         langs[v.lang] += v.updates
         _deps = set()
         if v.lang == 'python':
@@ -126,27 +125,27 @@ def analyze_module(module: Module, config: Config):
         }
     return {
         "name": module.name,
-        "dependencies": [{
+        "dependencies": list(filter(lambda x: x.get("percent") > 0, [{
             "name": d,
             "percent": round(v / updates, 2)
         } for d, v in deps.items()
-        ],
-        "authors": [{
+        ])),
+        "authors": list(filter(lambda x: x.get("percent") > 0, [{
             "name": a,
-            "percent": round(v / updates, 2)
+            "percent": round(v / updates, 4)
         } for a, v in authors.items()
-        ],
-        "languages": [{
+        ])),
+        "languages": list(filter(lambda x: x.get("percent") > 0, [{
             "name": l,
             "percent": round(v / updates, 2)
         } for l, v in langs.items()
-        ],
-        "features": [{
+        ])),
+        "features": list(filter(lambda x: x.get("percent") > 0, [{
             "author": author,
             "name": feature,
             "percent": round(value / updates, 2)
         } for (author, feature), value in author_feature.items()
-        ]
+        ]))
     }
 
 
@@ -169,7 +168,7 @@ def analyze(repo):
     }
     for module in modules:
         r["modules"].append(analyze_module(module, config))
-    print(json.dumps(r, indent=4))
+    print(json.dumps(r, indent=4, ensure_ascii=False))
 
 
 def main():

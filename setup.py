@@ -10,7 +10,9 @@ attrs = {
     "install_requires": [
         "esprima==4.0.1",
         "marshmallow==3.2.1",
-        "marshmallow-dataclass==6.0.0"
+        "marshmallow-dataclass==6.0.0",
+        "catboost==0.12.2",
+        "pandas==0.25.1"
     ],
     "entry_points": {
         "console_scripts": [
