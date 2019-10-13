@@ -16,8 +16,7 @@ REGEX_MESSAGE = re.compile(r'\s{4}(.*)')
 REGEX_NUMSTAT = re.compile(r'(\d+|-)\s+(\d+|-)\s+(.*)')
 REGEX_AUTHOR = re.compile('author\s(.+)\s<(.*)>\s(\d+)\s([+\-]\d{4})')
 REGEX_COMMITER = re.compile('committer\s(.+)\s<(.*)>\s(\d+)\s([+\-]\d{4})')
-REGEX_COMMIT = re.compile(r'''(commit\s(?P<commit>[a-f0-9]+)\ntree\s(?P<tree>[a-f0-9]+)\n(?P<parents>(parent\ [a-f0-9]+\n)*)(?P<author>author\s+(.+)\s+<(.*)>\s+(\d+)\s+([+\-]\d{4})\n)(?P<committer>committer\s+(.+)\s+<(.*)>\s+(\d+)\s+([+\-]\d{4})\n)(gpgsig\s(.*)\n\s(\n\s[^-]+)(.*)\n)?\n(?P<message>(\s{4}[^\n]*\n)*)\n(?P<stats>(^(\d+|-)\s+(\d+|-)\s+(.*)$\n)*))
-''', re.MULTILINE | re.VERBOSE)
+REGEX_COMMIT = re.compile(r'''(commit\s(?P<commit>[a-f0-9]+)\ntree\s(?P<tree>[a-f0-9]+)\n(?P<parents>(parent\ [a-f0-9]+\n)*)(?P<author>author\s+(.+)\s+<(.*)>\s+(\d+)\s+([+\-]\d{4})\n)(?P<committer>committer\s+(.+)\s+<(.*)>\s+(\d+)\s+([+\-]\d{4})\n)(gpgsig\s(.*)\n\s(\n\s[^-]+)(.*)\n)?\n(?P<message>(\s{4}[^\n]*\n)*)\n(?P<stats>(^(\d+|-)\s+(\d+|-)\s+(.*)$\n)*))''', re.MULTILINE | re.VERBOSE)
 
 
 REGEX_TICKET = re.compile("#[0-9]+")
@@ -400,3 +399,59 @@ class CommitMessageClassifier(Classifier):
 #     ioloop.run_until_complete(check())
 #     ioloop.stop()
 #     ioloop.close()
+from catboost import CatBoostClassifier
+
+X_train = pd.read_json('X_train')
+cat_model.load_model('cat_model')
+def predict_commit(new_commit,cat_model,X_train):
+
+    freq = pd.Series(''.join(new_commit).split()).value_counts()
+    dic1 = pd.DataFrame(freq)
+
+    dic1['repo'] = 'new'
+    dic1['guess'] = 'new'
+    dic1['lemma'] = dic1.index
+    dic1['id'] = random.randint(5, 15)
+    dic1['author'] = 'new'
+    dic1.rename(columns = {0 : 'count'}, inplace = True)
+
+    dic1.index = dic1['id']
+    dic1.index.name = 'index'
+
+    X_train = pd.read_json('X_train.json')
+    new_table = pd.pivot_table(dic1, index = 'id',
+                            columns = 'lemma',
+                            values='guess',
+                            aggfunc=len)
+    dic1.index.name = 'lemme'
+    dic1.index = dic1['lemma']
+
+
+    X_train_new = X_train.T
+    X_train_new.index.name = 'lemma'
+
+
+    X_train_new = X_train_new.join(dic1['count'],on = 'lemma').fillna(0)
+    #X_train_new.rename(columns = {'count' : random.randint(1, 95)},inplace = True)
+
+    predict = cat_model.predict(X_train_new[['count','ad380da3-971e-45fe-8305-f5395c4063b4']].T)[0]
+
+    predict_proba = cat_model.predict_proba(X_train_new[['count','ad380da3-971e-45fe-8305-f5395c4063b4']].T)[0]
+
+    predict = predict[0]
+    predict = int(predict)
+
+    if predict == 0:
+        predict = 'bugs'
+    elif predict == 1:
+        predict = 'docs'
+    elif predict == 2:
+        predict = 'features'
+    elif predict == 3:
+        predict = 'refactoring'
+    elif predict == 4:
+        predict = 'tests'
+    elif predict == 5:
+        predict = 'version'
+
+    return predict, predict_proba
