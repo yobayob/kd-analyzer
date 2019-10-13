@@ -66,13 +66,13 @@ def analyze_module(module: Module, config: Config):
         if lang == "python":
             try:
                 deps = get_python_deps(s)
-            except:
-                pass
+            except Exception as e:
+                logging.error("parse {} error {}".format(file, e))
         if lang == 'js':
             try:
                 deps = get_js_deps(s)
-            except:
-                pass
+            except Exception as e:
+                logging.error("parse {} error {}".format(file, e))
         results[file] = File(file, lang, deps)
     stdout, _ = exec('git log --numstat --pretty=raw -- {}'.format(path), cwd=path)
 
@@ -142,8 +142,8 @@ def analyze_module(module: Module, config: Config):
         } for l, v in langs.items()
         ],
         "features": [{
-            "name": author,
-            "feature": feature,
+            "author": author,
+            "name": feature,
             "percent": round(value / updates, 2)
         } for (author, feature), value in author_feature.items()
         ]
@@ -159,7 +159,7 @@ def analyze(repo):
     config = Config.from_file(os.path.join(BASE_DIR, DEFAULT_CONFIG_PATH))
     modules = (
         m
-        if m.path != "." else BASE_DIR
+        if m.path != "." else Module("main", BASE_DIR)
         for m in config.modules
     )
     r = {

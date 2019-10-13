@@ -45,21 +45,20 @@ def get_python_deps(s: str) -> Set[str]:
 
 
 def get_js_deps(s: str) -> Set[str]:
-    script = esprima.parseModule(s)
+    script = esprima.parseModule(s, { "jsx": True })
     r = set()
     for token in script.body:
         if token.type == 'ImportDeclaration':
             if str(token.source.value).startswith("."):
                 continue
-            r.add(token.source.value)
+            r.add(token.source.value.split('/')[0])
             continue
         if token.type == 'CallExpression':
             if token.callee.name != "require":
                 continue
-            print(token.arguments[0].value)
             if str(token.arguments[0].value).startswith("."):
                 continue
-            r.add(token.arguments[0].value)
+            r.add(token.arguments[0].value.split('/')[0])
     return r
 
 
