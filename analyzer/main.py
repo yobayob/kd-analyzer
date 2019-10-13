@@ -102,6 +102,7 @@ def analyze_module(module: Module, config: Config):
     for name, v in results.items():
 
         langs[v.lang] += v.updates
+
         _deps = set()
         if v.lang == 'python':
             for d in v.deps:
@@ -112,7 +113,6 @@ def analyze_module(module: Module, config: Config):
                 _deps.add(d)
         else:
             _deps = v.deps
-
         # TODO: skip inner dependency :)
         for d in _deps:
             deps[d] += v.updates / len(_deps)
