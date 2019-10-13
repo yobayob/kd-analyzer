@@ -83,7 +83,7 @@ def analyze_module(module: Module, config: Config):
 
     for commit in extract_commits(stdout):
 
-        feature = gitlog.classify_by_model(commit.message)
+        feature = gitlog.classify(commit.message)
         features[feature] += 1
         author = authors_aliases.get(commit.author.name, commit.author.name)
 
@@ -112,7 +112,7 @@ def analyze_module(module: Module, config: Config):
                 _deps.add(d)
         else:
             _deps = v.deps
-        # TODO: skip inner dependency :)
+        # TODO: JS DEPS invalid percents
         for d in _deps:
             deps[d] += v.updates / len(_deps)
     if not updates:
@@ -125,11 +125,11 @@ def analyze_module(module: Module, config: Config):
         }
     return {
         "name": module.name,
-        "dependencies": list(filter(lambda x: x.get("percent") > 0, [{
+        "dependencies": [{
             "name": d,
             "percent": round(v / updates, 2)
         } for d, v in deps.items()
-        ])),
+        ],
         "authors": list(filter(lambda x: x.get("percent") > 0, [{
             "name": a,
             "percent": round(v / updates, 4)
