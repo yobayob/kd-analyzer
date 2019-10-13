@@ -54,7 +54,6 @@ class Config:
                     line.strip().replace(".", "\.").replace("*", ".*").replace("/", "\\/")
                     for line in f.readlines()
                 ]))
-                print(ignore_list)
         except Exception as e:
             print(e)
             pass

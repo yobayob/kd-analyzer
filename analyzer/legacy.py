@@ -1,6 +1,5 @@
 from __future__ import division
 import argparse
-import asyncio
 from collections import defaultdict
 import json
 from .polyglot import Polyglot
@@ -10,6 +9,7 @@ import logging
 from deps import *
 
 logging.basicConfig(level = logging.DEBUG)
+
 
 CONFIG = {
     'ignore': [
