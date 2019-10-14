@@ -179,11 +179,11 @@ def skip(s, pos):
 
 
 def parse_blame_line_author(line: str) -> str:
-    return extract(line, REGEX_BLAME).groupdict().get('author')
+    return extract(line, REGEX_BLAME).groupdict().get('author').strip()
 
 
 def blame(fp: str):
-    result, _ = exec('git blame {}'.format(fp), cwd=os.path.basename(fp))
+    result, _ = exec('git blame -c {}'.format(fp), cwd=os.path.dirname(fp))
     buf = io.StringIO(result)
     result = defaultdict(lambda: 0.0)
     while True:

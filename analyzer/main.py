@@ -4,7 +4,7 @@ from .utils import scandir, exec
 from .polyglot import Polyglot
 from .deps import get_python_deps, get_js_deps
 from dataclasses import dataclass
-from .gitlog import CommitMessageClassifier, extract_commits
+from .gitlog import CommitMessageClassifier, extract_commits, blame
 from collections import defaultdict
 import logging
 import os
@@ -52,6 +52,8 @@ def analyze_module(module: Module, config: Config):
         raise Exception("module should be dir")
     files = scandir(path, config.ignore_list)
     results = {}
+    lines = 0.0
+    authors = defaultdict(lambda: 0.0)
     for file in files:
         logging.info("analyze {}".format(file))
         with open(file, "r", encoding="utf-8") as f:
@@ -60,6 +62,9 @@ def analyze_module(module: Module, config: Config):
             except:
                 results[file] = File(file, "UNKNOWN", set())
                 continue
+        for a, v in blame(file).items():
+            authors[authors_aliases.get(a, a)] += v
+            lines += v
         ext = pathlib.Path(file).suffix
         lang = polyglot.classify(s, ext)
         deps = set()
@@ -77,7 +82,6 @@ def analyze_module(module: Module, config: Config):
     stdout, _ = exec('git log --numstat --pretty=raw -- {}'.format(path), cwd=path)
 
     features = defaultdict(lambda: 0.0)
-    authors = defaultdict(lambda: 0.0)
     author_feature = defaultdict(lambda: 0.0)
     updates = 0.0
 
@@ -94,7 +98,6 @@ def analyze_module(module: Module, config: Config):
             __updates = insert + delete
             fl.updates += __updates
             updates += __updates
-            authors[author] += __updates
             author_feature[(author, feature)] += __updates
 
     langs = defaultdict(lambda: 0.0)
@@ -125,16 +128,12 @@ def analyze_module(module: Module, config: Config):
         }
     return {
         "name": module.name,
-        "dependencies": [{
-            "name": d,
-            "percent": round(v / updates, 2)
-        } for d, v in deps.items()
+        "dependencies": [d for d, v in deps.items()
         ],
         "authors": list(filter(lambda x: x.get("percent") > 0, [{
-            "name": a,
-            "percent": round(v / updates, 4)
-        } for a, v in authors.items()
-        ])),
+            "name": author,
+            "percent": round(value / lines, 2)
+        } for author, value in authors.items()])),
         "languages": list(filter(lambda x: x.get("percent") > 0, [{
             "name": l,
             "percent": round(v / updates, 2)
@@ -186,3 +185,5 @@ def main():
 
     if not args.cmd:
         analyze(args.repo)
+
+
